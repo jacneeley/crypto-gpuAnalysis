@@ -25,4 +25,11 @@ for i in gpu['eBay Price']:
     prices.append(float(i.strip('$').replace(',','')))
 gpu['eBay Price']= prices
 
+gpus = []
+for i in gpu['GPU']:
+    gpus.append(i.strip('(opens in new tab) '))
+gpu['GPU'] = gpus
+
 #fills
+
+#gpu = gpu.drop(gpu[gpu['GPU'].value_counts() > 12]) WIP
