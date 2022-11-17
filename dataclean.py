@@ -15,9 +15,14 @@ gpu = pd.read_csv(r'C:/Users/Jacne/Documents/python/visualization_and_datamining
 
 
 #need prices from 10/1/2021 : 09/30/2022 only
-btc = btc.drop(btc[btc['Unix Epoch Time(Seconds)'] < 1633132800].index) #10/1/2021
-btc = btc.drop(btc[btc['Unix Epoch Time(Seconds)'] > 1664582400].index) #09/30/2022
+btc = btc.drop(btc[btc['Unix Epoch Time(Seconds)'] < 1633132800].index)
+btc = btc.drop(btc[btc['Unix Epoch Time(Seconds)'] > 1664582400].index)
 
+#conversions
+prices = []
+gpu['eBay Price'] = gpu['eBay Price'].astype(str)
+for i in gpu['eBay Price']:
+    prices.append(float(i.strip('$').replace(',','')))
+gpu['eBay Price']= prices
 
-
-
+#fills
