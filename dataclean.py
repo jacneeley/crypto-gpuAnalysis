@@ -30,6 +30,9 @@ for i in gpu['GPU']:
     gpus.append(i.strip('(opens in new tab) '))
 gpu['GPU'] = gpus
 
-#fills
+#drop cards that have a frequency less than 12
+gpu = gpu[gpu.groupby('GPU').GPU.transform('count')>11]#transform function is goofy, i goes by index.
+gpu['GPU'].value_counts()
 
-#gpu = gpu.drop(gpu[gpu['GPU'].value_counts() > 12]) WIP
+
+
