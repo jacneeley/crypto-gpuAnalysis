@@ -19,6 +19,61 @@ btc = btc.drop(btc[btc['Unix Epoch Time(Seconds)'] < 1633132800].index)
 btc = btc.drop(btc[btc['Unix Epoch Time(Seconds)'] > 1664582400].index)
 btc = btc.reset_index(drop=True)
 
+
+#not very efficient, works for now. Needs to be dynamic in the future.
+months = []
+for i in btc['DateTime']:
+    if i.startswith('10/'):
+        i = 'October'
+        months.append(i)
+    if i.startswith('11/'):
+        i='November'
+        months.append(i)
+    if i.startswith('12/'):
+        i='December'
+        months.append(i)
+    if i.startswith('1/'):
+        i='January'
+        months.append(i)
+    if i.startswith('2/'):
+        i='Febuary'
+        months.append(i)
+    if i.startswith('3/'):
+        i='March'
+        months.append(i)
+    if i.startswith('4/'):
+        i='April'
+        months.append(i)
+    if i.startswith('5/'):
+        i='May'
+        months.append(i)
+    if i.startswith('6/'):
+        i='June'
+        months.append(i)
+    if i.startswith('7/'):
+        i='July'
+        months.append(i)
+    if i.startswith('8/'):
+        i='August'
+        months.append(i)
+    if i.startswith('9/'):
+        i='September'
+        months.append(i)        
+btc['DateTime'] = months
+
+
+#collect monthly average from btc
+#list of prices by month
+blst = []
+for i in btc['DateTime'].unique():
+    blst.append(pd.DataFrame(btc[btc['DateTime']== i]))
+    
+#avg bitcoin price per month & epoch time
+btcp = []
+btct = []
+for i in blst:
+    btcp.append(round(i['Price'].mean(),2))
+    btct.append(round(i['Unix Epoch Time(Seconds)'].mean(),2))
 #conversions
 prices = []
 gpu['eBay Price'] = gpu['eBay Price'].astype(str)
@@ -34,38 +89,42 @@ gpu['GPU'] = gpus
 #drop cards that have a frequency less than 12
 gpu = gpu[gpu.groupby('GPU').GPU.transform('count')>11]#transform function is goofy, i goes by index.
 
-#inefficient, but works for now. This needs to be dynamic in the Future.
-card1 = pd.DataFrame(gpu[gpu['GPU']=='Radeon RX 6600'])
-card2 = pd.DataFrame(gpu[gpu['GPU']=='Radeon RX 6600 XT'])
-card3 = pd.DataFrame(gpu[gpu['GPU']=='Radeon RX 6700 XT'])
-card4 = pd.DataFrame(gpu[gpu['GPU']=='Radeon RX 6800'])
-card5 = pd.DataFrame(gpu[gpu['GPU']=='Radeon RX 6800 XT'])
-card6 = pd.DataFrame(gpu[gpu['GPU']=='Radeon RX 6900 XT'])
-card7 = pd.DataFrame(gpu[gpu['GPU']=='GeForce RTX 3060 T'])
-card8 = pd.DataFrame(gpu[gpu['GPU']=='GeForce RTX 3070'])
-card9 = pd.DataFrame(gpu[gpu['GPU']=='GeForce RTX 3070 T'])
-card10 = pd.DataFrame(gpu[gpu['GPU']=='GeForce RTX 3080'])
-card11 = pd.DataFrame(gpu[gpu['GPU']=='GeForce RTX 3080 T'])
-card12 = pd.DataFrame(gpu[gpu['GPU']=='GeForce RTX 3090'])
-##################################################################################
+#create a dataframe for each card
+clst=[]
+for i in gpu['GPU'].unique():
+    clst.append(pd.DataFrame(gpu[gpu['GPU']==i]))
 
-clst = [card1,card2,card3,card4,card5,card6
-        ,card7,card8,card9,card10,card11,card12]
-sums = []
-for c in clst:
-    #c.drop(['QTY Sold'],axis=1, inplace = True)
-    sums.append(round((c['eBay Price'].sum()*12)/(365),2))
-    
-headers = []
-itr = 0
-for g in gpu['GPU']:  
+#build some arrays
+p = []
+for i in clst:
+    #i.drop(['QTY Sold'],axis=1,inplace=True)
+    for c in i['eBay Price']:
+        p.append(c)  
+priceAr = np.array(p).reshape(12,12)
+priceAr = priceAr.T
+
+monthly_btc = np.array(btcp).reshape(12,1)
+epoch_month = np.array(btct).reshape(12,1)
+##################################################################################
+#building new dataframes from old ones
+
+
+
+headers = []    
+for g in gpu['GPU'].unique():  
     headers.append(g)
-    itr+=1
-    if itr == 12:
-        break
-    
-dailyAvgPrice = pd.DataFrame([sums]*365,columns = headers)
-btc_gpu = pd.concat([btc,dailyAvgPrice],axis = 1, join='inner')
-export_csv = btc_gpu.to_csv(r'btc_gpu_mktData.csv',index = None, header = True)  
+gpudf = pd.DataFrame(priceAr)
+gpudf.columns = headers
+
+btcar = np.concatenate((epoch_month,monthly_btc),axis =1)
+btcdf = pd.DataFrame(btcar)
+months = []
+btcdf.inser(0,'month',months )
+
+
+
+
+btc_gpu = pd.concat([btcdf,gpudf],axis = 1, join='inner')
+#export_csv = btc_gpu.to_csv(r'btc_gpu_mktData.csv',index = None, header = True)  
     
 
