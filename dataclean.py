@@ -7,6 +7,7 @@ Created on Tue Nov 15 11:44:20 2022
 
 import numpy as np
 import pandas as pd
+from collections import OrderedDict
 import csv
 import datetime
 
@@ -21,6 +22,7 @@ btc = btc.reset_index(drop=True)
 
 
 #not very efficient, works for now. Needs to be dynamic in the future.
+#switch statement would be great, but python 3.9 does not have that...
 months = []
 for i in btc['DateTime']:
     if i.startswith('10/'):
@@ -89,6 +91,7 @@ gpu['GPU'] = gpus
 #drop cards that have a frequency less than 12
 gpu = gpu[gpu.groupby('GPU').GPU.transform('count')>11]#transform function is goofy, i goes by index.
 
+
 #create a dataframe for each card
 clst=[]
 for i in gpu['GPU'].unique():
@@ -97,7 +100,7 @@ for i in gpu['GPU'].unique():
 #build some arrays
 p = []
 for i in clst:
-    #i.drop(['QTY Sold'],axis=1,inplace=True)
+    i.drop(['QTY Sold'],axis=1,inplace=True)
     for c in i['eBay Price']:
         p.append(c)  
 priceAr = np.array(p).reshape(12,12)
@@ -108,23 +111,25 @@ epoch_month = np.array(btct).reshape(12,1)
 ##################################################################################
 #building new dataframes from old ones
 
-
-
 headers = []    
 for g in gpu['GPU'].unique():  
     headers.append(g)
 gpudf = pd.DataFrame(priceAr)
 gpudf.columns = headers
+gpudf = gpudf.astype(float)
 
 btcar = np.concatenate((epoch_month,monthly_btc),axis =1)
 btcdf = pd.DataFrame(btcar)
-months = []
-btcdf.inser(0,'month',months )
+months = list(OrderedDict.fromkeys(months)) #remove duplicates from months list
+btcdf.insert(0,'month',months )
+btcdf.rename(columns = {0:'Unix Epoch Time',1:'btc_Price'},inplace=True)
 
 
-
+# using dictionary to convert specific columns
+convert_dict = {'Unix Epoch Time': int,'btc_Price': float}
+btcdf = btcdf.astype(convert_dict)
 
 btc_gpu = pd.concat([btcdf,gpudf],axis = 1, join='inner')
-#export_csv = btc_gpu.to_csv(r'btc_gpu_mktData.csv',index = None, header = True)  
+export_csv = btc_gpu.to_csv(r'btc_gpu_mktData.csv',index = None, header = True)  
     
 
