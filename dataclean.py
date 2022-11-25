@@ -73,9 +73,14 @@ for i in btc['DateTime'].unique():
 #avg bitcoin price per month & epoch time
 btcp = []
 btct = []
+bsamp = []
 for i in blst:
     btcp.append(round(i['Price'].mean(),2))
     btct.append(round(i['Unix Epoch Time(Seconds)'].mean(),2))
+    #randomly sample values from each month
+    bsamp.append(i.sample(n=12))
+
+  
 #conversions
 prices = []
 gpu['eBay Price'] = gpu['eBay Price'].astype(str)
@@ -90,7 +95,7 @@ gpu['GPU'] = gpus
 
 #drop cards that have a frequency less than 12
 gpu = gpu[gpu.groupby('GPU').GPU.transform('count')>11]#transform function is goofy, i goes by index.
-
+gpu = gpu.reset_index(drop=True)
 
 #create a dataframe for each card
 clst=[]
@@ -106,8 +111,16 @@ for i in clst:
 priceAr = np.array(p).reshape(12,12)
 priceAr = priceAr.T
 
+
+b= []
+for i in bsamp:
+    i.drop(['Unix Epoch Time(Seconds)'],axis=1,inplace=True)
+    for j in i['Price']:
+        b.append(j)
+
 monthly_btc = np.array(btcp).reshape(12,1)
 epoch_month = np.array(btct).reshape(12,1)
+btc_samples = np.array(b).reshape(144,1)
 ##################################################################################
 #building new dataframes from old ones
 
@@ -124,12 +137,19 @@ months = list(OrderedDict.fromkeys(months)) #remove duplicates from months list
 btcdf.insert(0,'month',months )
 btcdf.rename(columns = {0:'Unix Epoch Time',1:'btc_Price'},inplace=True)
 
+bsamples = pd.DataFrame(btc_samples)
+bsamples.rename(columns = {0:'btc_Prices'},inplace=True)
 
 # using dictionary to convert specific columns
 convert_dict = {'Unix Epoch Time': int,'btc_Price': float}
 btcdf = btcdf.astype(convert_dict)
 
+#avg mkt data
 btc_gpu = pd.concat([btcdf,gpudf],axis = 1, join='inner')
-export_csv = btc_gpu.to_csv(r'btc_gpu_mktData.csv',index = None, header = True)  
-    
+export_csv = btc_gpu.to_csv(r'btc_gpu_avgMktData.csv',index = None, header = True)  
+
+#mkt samples
+btc_gpu_samples = pd.concat([gpu,bsamples],axis = 1,join='inner')
+export_csv = btc_gpu.to_csv(r'btc_gpu_mktSamples.csv',index = None, header = True)  
+   
 
