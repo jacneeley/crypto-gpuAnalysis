@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Nov 15 11:44:20 2022
-
 @author: Jacne
 """
 
@@ -150,6 +149,5 @@ export_csv = btc_gpu.to_csv(r'btc_gpu_avgMktData.csv',index = None, header = Tru
 
 #mkt samples
 btc_gpu_samples = pd.concat([gpu,bsamples],axis = 1,join='inner')
-export_csv = btc_gpu.to_csv(r'btc_gpu_mktSamples.csv',index = None, header = True)  
-   
-
+export_csv = btc_gpu_samples.to_csv(r'btc_gpu_mktSamples.csv',index = None, header = True)  
+  

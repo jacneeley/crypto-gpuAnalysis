@@ -4,6 +4,7 @@ head(resale)
 round(cor(resale[c(-1,-2)]),4) #positive correlation between btc_Price and given gpu Price
 summary(resale)
 
+
 #Linear Regression Model - Summarize Data
 
 #Most popular mining gpus - based on google search
@@ -48,3 +49,15 @@ r2<-residuals(o2)
 #increasing or decreasing variance?
 plot(r1~p1,xlab="predicted",ylab="Residuals")
 plot(r2~p1,xlab="predicted",ylab="Residuals")
+###########################################################################################
+
+#samples model
+mktsamples<-read.table(file="C:/Users/Jacne/Documents/python/visualization_and_datamining/data/dataminingProject/btc_gpu_mktSamples.csv",sep=',',header = TRUE)
+attach(mktsamples)
+head(mktsamples)
+round(cor(mktsamples[c(-1)]),4)
+summary(mktsamples)
+
+#Linear Regression Model - Summarize data
+o1<-lm(eBay.Price~btc_Prices+factor(GPU))
+
