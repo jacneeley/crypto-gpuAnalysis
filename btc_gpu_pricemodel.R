@@ -46,9 +46,11 @@ p2<-predict(o2)
 r1<-residuals(o1)
 r2<-residuals(o2)
 
-#increasing or decreasing variance?
+#increasing or decreasing variance? - Increasing/Decreasing , significantly. -> bad b/c non-constant.
 plot(r1~p1,xlab="predicted",ylab="Residuals")
 plot(r2~p1,xlab="predicted",ylab="Residuals")
+plot(o1)
+#estimates for this models coefficients are not reliable
 ###########################################################################################
 
 #samples model
@@ -58,6 +60,57 @@ head(mktsamples)
 round(cor(mktsamples[c(-1)]),4)
 summary(mktsamples)
 
-#Linear Regression Model - Summarize data
-o1<-lm(eBay.Price~btc_Prices+factor(GPU))
 
+#GPU eBAY Price relative to bitcoin Price
+plot(eBay.Price~btc_Prices)
+abline(a=mean(eBay.Price),b=0,col="green")
+
+#predict and residual equations
+p1<-predict(lm(eBay.Price~btc_Prices))
+ro2<-residuals(lm(eBay.Price~btc_Prices))
+
+#residuals vs predicted, are the residuals' variance increasing/decreasing or constant?
+plot(ro2~p1,xlab="predicted",ylab="Residuals")
+#most data is constant, scattered randomly, constant variance.
+#create residuals vs fitted
+f1<-lm(eBay.Price~btc_Prices+factor(GPU))
+plot(f1)
+
+
+plot(eBay.Price~btc_Prices)
+abline(a=)
+#Linear Regression Model - Summarize data
+o1<-lm(eBay.Price~btc_Prices)
+#Let's say alpha = .05. H_null: bit coin prices have no affect on gpu ebay prices
+summary(o1)
+#p-value = 2.2e-16; smaller than any reasonable alpha. Reject Null hypothesis.
+#we can only explain 30.78% of our eBay prices currently...
+#Adjusted R-squared:  0.3059
+
+#what about our expected eBay prices if btc was 0?
+#b0 = 4.684e+02 = 468.40
+
+#add 1000 units
+#468.40* 1000 = 468400
+
+#can using factor(GPU) improve the model?
+summary(f1)
+#Multiple R-squared:  .8825,	Adjusted R-squared:  .8742!!!
+
+#################################################################################
+
+#let's look at correlation again.
+round(cor(mktsamples[c(-1)]),4)
+#QTY sold is not as strongly correlated as btc_price
+
+#Will creating a more complex model, a model that includes QTY sold, be a better predictor than our previous model?
+o2<-lm(eBay.Price~btc_Prices+QTY.Sold)
+summary(o2)
+#Multiple R-squared:  .3148,	Adjusted R-squared:  0.3109 ; good in-comparison to o1
+
+f2<-lm(eBay.Price~btc_Prices+QTY.Sold+factor(GPU))
+summary(f2)
+#Multiple R-squared:  .886,	Adjusted R-squared:  .8775; when we factor gpu, we should include QTY sold.
+
+
+#mktsamples[mktsamples$GPU != 'GeForce RTX 3080', ]
