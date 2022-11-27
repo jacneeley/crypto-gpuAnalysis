@@ -29,17 +29,18 @@ headers = headers[:3]
 df = pd.DataFrame(columns = headers)
 
 
-max_pages = 12
+max_pages = 24
 current_page = 1
     
 while current_page <= max_pages:
     current_url= f'{url}/{current_page}'
+
     
     html = requests.get(current_url)
     soup = bs(html.text,'html.parser')
     table = soup.find('table',{'class':'table__wrapper table__wrapper--inbodyContent table__wrapper--sticky table__wrapper--divider'})
     tTitle=soup.find('caption',{'class':'table__caption table__caption--top table__caption--left'})
-    print(tTitle.text)
+    #print(tTitle.text)
     print(current_url)
     
     for row in table.find_all('tr')[1:]:#exclude header
@@ -48,12 +49,11 @@ while current_page <= max_pages:
         length = len(df)
         df.loc[length] = row_data
         
-    time.sleep(1) #sleep for 5 seconds to prevent sending too many requests
+    #time.sleep(1) #sleep for 5 seconds to prevent sending too many requests
     current_page+=1
-    
-#data, starting at index[0], is September 2022 <- October 2021
 
-df.rename(columns = {'Sept eBay Price':'eBay Price'},inplace = True)
+
+df.rename(columns = {'Oct eBay Price':'eBay Price'},inplace = True)
 df=df.replace('N/A','nan')
 
 #optionally, if we want to start from 1 year ago(october21), reverse the df
