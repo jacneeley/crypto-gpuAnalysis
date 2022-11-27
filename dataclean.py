@@ -82,9 +82,11 @@ for i in gpu['GPU']:
     gpus.append(i.strip('(opens in new tab) '))
 gpu['GPU'] = gpus
 gpu['QTY Sold'] = gpu['QTY Sold'].astype(float)
+
+#values that need to be dropped
 gpu = gpu.dropna()
-#gpu = gpu.sort_values(by='eBay Price',ascending = False)
-gpu = gpu.drop(index=343)
+#Drop Values that appear only once, b/c we can't predict them in our model.
+gpu = gpu[gpu.groupby('GPU').GPU.transform(len) > 1]
 gpu = gpu.reset_index(drop=True)
 
 
