@@ -29,7 +29,7 @@ headers = headers[:3]
 df = pd.DataFrame(columns = headers)
 
 
-max_pages = 25
+max_pages = 24
 current_page = 1
     
 while current_page <= max_pages:
