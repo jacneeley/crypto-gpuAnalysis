@@ -10,7 +10,7 @@ import pandas as pd
 import csv 
 import datetime
 
-btc = pd.read_csv(r'C:/Users/Jacne/Documents/python/visualization_and_datamining/data/market-price.csv',sep=',')
+btc = pd.read_csv(r'C:/yourPATH/market-price.csv',sep=',')
 
 date_time = []
 for i in btc['x']:
