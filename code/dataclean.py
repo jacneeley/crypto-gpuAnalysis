@@ -10,8 +10,10 @@ from collections import OrderedDict
 import csv
 import datetime
 
+
 btc = pd.read_csv(r'C:/yourPATH/btc_mktPrice.csv',sep=',')
 gpu = pd.read_csv(r'C:/yourPATH/averageMonthlyGPUPrice_ebay.csv',sep=',')
+
 
 btc = btc.drop(btc[btc['Unix Epoch Time(Seconds)'] <= 1616198400].index)
 
