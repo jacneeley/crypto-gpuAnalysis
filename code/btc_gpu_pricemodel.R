@@ -1,5 +1,7 @@
 #samples model - bit coin prices and GPU ebay prices were taken over the last 1.5 -> 2 years.
-Path<-"C:/somePath/btc_gpu_mktSamples.csv"
+
+Path<-"C:/yourPATH/btc_gpu_mktSamples.csv"
+
 mktsamples<-read.table(file=Path,sep=',',header = TRUE)
 attach(mktsamples)
 head(mktsamples)
@@ -32,7 +34,7 @@ library(nortest)
 lillie.test(ro2)
 
 #are the residuals autocorrelated?
-acf(ro2) #passes assumption? residuals are independent? I think? Need help interpreting this...
+acf(ro2) #Fails...
 
 
 plot(eBay.Price~btc_Prices)
