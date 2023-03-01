@@ -1,5 +1,5 @@
 #samples model - bit coin prices and GPU ebay prices were taken over the last 1.5 -> 2 years.
-Path<-"C:/Users/Jacne/Documents/python/visualization_and_datamining/data/dataminingProject/btc_gpu_mktSamples.csv"
+Path<-"C:/somePath/btc_gpu_mktSamples.csv"
 mktsamples<-read.table(file=Path,sep=',',header = TRUE)
 attach(mktsamples)
 head(mktsamples)
